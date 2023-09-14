@@ -2,6 +2,7 @@ from flipside import Flipside
 import numpy as np
 import pandas as pd 
 import plotly.graph_objects as go
+import pmdarima as pm
 
 """ This repo GITIGNORES api_key.txt, use this convention to store your key safely"""
 
@@ -103,3 +104,23 @@ fig.update_layout(title='Candlestick Chart',
 # Save chart as html you can open in browser 
 fig.write_html('candlestick_chart.html')
 
+eth_vwap_close = np.array(eth_vwap['close'])
+
+arima_model = pm.auto_arima(eth_vwap_close, seasonal=False, stepwise=True, suppress_warnings=True)
+
+# Forecast the next 5 periods
+n_periods = 5
+forecast, conf_int = arima_model.predict(n_periods=n_periods, return_conf_int=True)
+
+trace1 = go.Scatter(x=list(range(1, len(eth_vwap_close) + 1)), y=eth_vwap_close,
+                    mode='markers+lines', name='close')
+
+# Create a trace for the 'forecast' data with NaN for missing values
+trace2 = go.Scatter(x=list(range(len(eth_vwap_close) + 1, len(eth_vwap_close) + len(forecast) + 1)),
+                    y=forecast, mode='markers+lines', name='forecast')
+
+fig2 = go.Figure(data=[trace1, trace2])
+
+# Create the plotly figure
+# Show the plot
+fig2.write_html('forecast_chart.html')
