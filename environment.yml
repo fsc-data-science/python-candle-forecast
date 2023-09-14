@@ -39,4 +39,3 @@ dependencies:
       - typing-extensions==4.7.1
       - tzdata==2023.3
       - urllib3==1.26.16
-prefix: C:\Users\crmer\miniconda3\envs\python-candle-forecast
